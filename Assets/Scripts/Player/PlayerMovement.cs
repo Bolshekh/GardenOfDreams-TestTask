@@ -15,8 +15,8 @@ public class PlayerMovement : MonoBehaviour
 	Animator animator;
 
 	//gizmos
-	Vector2 moveDirection;
-	Vector2 lookDirection;
+	public Vector2 MoveDirection { get; private set; }
+	public Vector2 LookDirection { get; private set; }
 
 	//basic movement
 	[SerializeField] float moveSpeed;
@@ -41,11 +41,11 @@ public class PlayerMovement : MonoBehaviour
 
 	protected virtual void CheckMovement()
 	{
-		moveDirection = new Vector2(HorizontalAxisInput, VerticalAxisInput).normalized;
+		MoveDirection = new Vector2(HorizontalAxisInput, VerticalAxisInput).normalized;
 
 		var _mouse = (Vector2)Camera.main.ScreenToWorldPoint(MousePositionInput);
 
-		lookDirection = _mouse - (Vector2)transform.position;
+		LookDirection = _mouse - (Vector2)transform.position;
 
 		if (CancelButtonInput)
 			MenuManager.Manager.SwitchPause();
@@ -53,14 +53,14 @@ public class PlayerMovement : MonoBehaviour
 
 	protected virtual void ApplyMovement()
 	{
-		if (moveDirection.magnitude != 0)
+		if (MoveDirection.magnitude != 0)
 		{
-			playerRB.AddForce(moveSpeed * speedMultiplier * GetForceMultiplierValue(playerRB.velocity.magnitude) * moveDirection, ForceMode2D.Force);
+			playerRB.AddForce(moveSpeed * speedMultiplier * GetForceMultiplierValue(playerRB.velocity.magnitude) * MoveDirection, ForceMode2D.Force);
 		}
 	}
 	protected virtual void ApplyRotation()
 	{
-		transform.rotation = Quaternion.FromToRotation(Vector2.up, lookDirection);
+		transform.rotation = Quaternion.FromToRotation(Vector2.up, LookDirection);
 	}
 	public void UpgradeSpeed(float Speed)
 	{

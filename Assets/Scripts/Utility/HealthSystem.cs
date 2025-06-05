@@ -9,6 +9,7 @@ public class HealthSystem : MonoBehaviour, IHitable
 	[SerializeField] float healthPoints = 3f;
 	[SerializeField] float maxHealthPoints = 3f;
 	public float MaxHealthPoints => maxHealthPoints;
+	public float CurrentHealthPoints => healthPoints;
 
 	public bool IsDied { get; private set; } = false;
 

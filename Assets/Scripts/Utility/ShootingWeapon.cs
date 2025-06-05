@@ -1,103 +1,51 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using UnityEngine;
-//upgrade scatter = very bad practice. need to change it next dev
-public class ShootingWeapon : Weapon
+[RequireComponent(typeof(WeaponSway))]
+public class ShootingWeapon : MonoBehaviour, IWeapon
 {
-	[SerializeField] GameObject bullet;
+	//stats
+	[SerializeField] protected float weaponDamage;
+	public float Damage => weaponDamage;
+
+	[SerializeField] protected float weaponKnockback;
+	public float Knockback => weaponKnockback;
+
+	//tip
 	[SerializeField] GameObject gunPoint;
+	[SerializeField] LayerMask targetLayer;
+	WeaponSway weaponSway;
 
-	//bulletspeed
-	[SerializeField] float bulletSpeed = 10f;
+	//cooldown
+	[SerializeField] float cooldown = 0.1f;
+	float shotTime;
 
-	List<float> bulletSpeedMod = new List<float>();
-	float bulletSpeedTotal => bulletSpeedMod.Aggregate(0f, (total, next) => total += next) + bulletSpeed;
-	float bulletSpeedBuffered;
+	//events
+	public event EventHandler<WeaponHitEventArgs> WeaponHit;
 
-	//firespeed
-	[SerializeField] float baseFireSpeed = 1f;
-	List<float> fireSpeedMod = new List<float>();
-	float fireSpeedTotal => fireSpeedMod.Aggregate(0f, (total, next) => total += next) * baseFireSpeed;
-	[SerializeField] AnimationCurve fireSpeedToDelayConverter;
-
-	//damage and knockback
-	[SerializeField] float damage = 1f;
-	[SerializeField] float knockback = 10f;
-
-	//passthrough
-	//float passThrough = 0;
-
-	[SerializeField] Cooldown delayBetweenShots = new Cooldown();
-	ParticleSystem shootingParticles;
-	// Start is called before the first frame update
 	void Start()
 	{
-		shootingParticles = GetComponent<ParticleSystem>();
-		bulletSpeedBuffered = bulletSpeedTotal;
-		AddFireSpeed(1);
+		weaponSway = GetComponent<WeaponSway>();
+
 		WeaponHit += (s, e) =>
 		{
-			e.Hit.Hit(new HitInfo() 
-			{
-				Damage = this.Damage,
-				Hitter = gameObject,
-				Knockback = Knockback * (e.Collision.transform.position - transform.position)
-			});
+			e.Hit.Hit(new HitInfo() { Damage = this.Damage, Hitter = gameObject });
 		};
 	}
-
-	public void AddFireSpeed(float Speed)
+	public void Use()
 	{
-		fireSpeedMod.Add(Speed);
-		UpdateStats();
-	}
-	public void AddBulletSpeed(float Speed)
-	{
-		bulletSpeedMod.Add(Speed);
-		UpdateStats();
-	}
-	public void Upgrade(float? damage = null, float? knockback = null)
-	{
-		if (damage != null) this.damage += (float)damage;
-		if (knockback != null) this.knockback += (float)knockback;
-	}
-	public void UpdateStats()
-	{
-		delayBetweenShots.CooldownTime = fireSpeedToDelayConverter.Evaluate(fireSpeedTotal);
-		bulletSpeedBuffered = bulletSpeedTotal;
-	}
-	public async void Shoot()
-	{
-		if (delayBetweenShots.IsCoolingDown) return;
+		if (Time.time < shotTime) return;
+		shotTime = Time.time + cooldown;
 
-		var obj = Instantiate(bullet, gunPoint.transform.position, gunPoint.transform.rotation);
-		obj.GetComponent<Rigidbody2D>()?.AddForce(bulletSpeedBuffered * (gunPoint.transform.root.up), ForceMode2D.Impulse);
+		Debug.Log("shot");
 
+		var _hit = Physics2D.Raycast(gunPoint.transform.position, transform.up, Mathf.Infinity, targetLayer.value);
 
-		delayBetweenShots.StartCooldown();
-
-		//visuals
-		await Task.Delay((int)(delayBetweenShots.CooldownTime * 150));
-		shootingParticles.Play();
-	}
-	public HitResponse Hit(IHitable target, Collider2D collision, Vector3 BulletPosition)
-	{
-		//if (Hits.Contains(collision.gameObject)) passthough upgrade??
-		//{
-		//	if(passThrough )
-		//	return HitResponse.Ignore;
-		//}
-
-
-		//Hits.Add(collision.gameObject);
-		
-		return target.Hit(new HitInfo()
+		var _h = _hit.collider.gameObject.GetComponent<IHitable>();
+		if (_h != null)
 		{
-			Damage = this.damage,
-			Hitter = this.gameObject,
-			Knockback = knockback * (collision.transform.position - BulletPosition)
-		});
+			WeaponHit?.Invoke(this, new WeaponHitEventArgs() { Hit = _h, Collision = _hit.collider });
+		}
 	}
 }

@@ -11,7 +11,7 @@ public class PlayerManager : MonoBehaviour
 	public PlayerMovement PlayerMovement { get; private set; }
 
 	//TODO: Weapon switch (maybe?)
-	public ShootingWeapon PlayerWeapon { get; private set; }
+	public IWeapon PlayerWeapon { get; private set; }
 	// Start is called before the first frame update
 	void Start()
 	{
@@ -19,7 +19,7 @@ public class PlayerManager : MonoBehaviour
 		Manager = this;
 		PlayerHealth = Player.GetComponent<HealthSystem>();
 		PlayerMovement = Player.GetComponent<PlayerMovement>();
-		PlayerWeapon = Player.GetComponentInChildren<ShootingWeapon>();
+		PlayerWeapon = Player.GetComponentInChildren<IWeapon>();
 	}
 
 }
