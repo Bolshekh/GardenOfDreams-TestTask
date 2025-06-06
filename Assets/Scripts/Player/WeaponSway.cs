@@ -36,7 +36,7 @@ public class WeaponSway : MonoBehaviour
 		RenderLine();
 		PositionGun();
 		RotateGun();
-		MirrorGun();
+		//MirrorGun();
 
 		//Debug.DrawRay(transform.position, targeting, Color.red, 1f);
 		//	Debug.DrawRay(playerMovement.transform.position, targeting, Color.yellow, 1f);

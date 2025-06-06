@@ -7,10 +7,12 @@ public class EnemyInit : MonoBehaviour
 {
 	HealthSystem healthSystem;
 	[SerializeField] Slider healthSlider;
+	Rigidbody2D enemyRigidbody;
 	// Start is called before the first frame update
 	void Start()
 	{
 		healthSystem = GetComponent<HealthSystem>();
+		enemyRigidbody = GetComponent<Rigidbody2D>();
 
 		healthSlider.maxValue = healthSystem.MaxHealthPoints;
 		healthSlider.value = healthSystem.CurrentHealthPoints;
@@ -23,6 +25,8 @@ public class EnemyInit : MonoBehaviour
 				healthSlider.gameObject.SetActive(false);
 
 			healthSlider.value = e.HealthAfter;
+
+			enemyRigidbody.AddForce(e.HitInfo.Knockback, ForceMode2D.Impulse);
 		};
 
 		healthSystem.EntityHealed += (s, e) =>
