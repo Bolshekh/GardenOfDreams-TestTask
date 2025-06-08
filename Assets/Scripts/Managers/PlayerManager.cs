@@ -9,6 +9,7 @@ public class PlayerManager : MonoBehaviour
 	public static PlayerManager Manager { get; private set; }
 	public HealthSystem PlayerHealth { get; private set; }
 	public PlayerMovement PlayerMovement { get; private set; }
+	public PlayerInventory PlayerInventory { get; private set; }
 
 	//TODO: Weapon switch (maybe?)
 	public IWeapon PlayerWeapon { get; private set; }
@@ -20,6 +21,7 @@ public class PlayerManager : MonoBehaviour
 		PlayerHealth = Player.GetComponent<HealthSystem>();
 		PlayerMovement = Player.GetComponent<PlayerMovement>();
 		PlayerWeapon = Player.GetComponentInChildren<IWeapon>();
+		PlayerInventory = Player.GetComponent<PlayerInventory>();
 	}
 
 }
