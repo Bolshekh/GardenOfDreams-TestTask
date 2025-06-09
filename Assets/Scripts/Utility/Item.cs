@@ -1,15 +1,17 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
+[Serializable]
 public class Item : MonoBehaviour, IUsable
 {
 	public string ItemName
 	{
 		get => itemName;
-		private set => itemName = value;
+		set => itemName = value;
 	}
 	[SerializeField] string itemName;
 	public int ItemAmount
@@ -18,40 +20,38 @@ public class Item : MonoBehaviour, IUsable
 		set => itemAmount = value;
 	}
 	[SerializeField] int itemAmount;
+
 	[SerializeField] Sprite itemIcon;
-	[SerializeField] Image itemIconComponent;
-	[SerializeField] TMP_Text itemNameComponent;
-	[SerializeField] TMP_Text itemAmountComponent;
-	bool IsOnGround = true;
-	// Start is called before the first frame update
-	void Start()
-	{
-		
-	}
 
-	// Update is called once per frame
-	void Update()
-	{
+	Image itemIconComponent;
+	TMP_Text itemNameComponent;
+	TMP_Text itemAmountComponent;
 
-	}
-	public void Use()
+	public virtual void Use()
 	{
-
+		PlayerManager.Manager.PlayerInventory.RemoveItem(this);
 	}
-	public void ResetVisuals()
+	public virtual void Instantiate()
 	{
+		itemIconComponent = transform.GetChild(0).GetComponent<Image>();
+		itemNameComponent = transform.GetChild(1).GetComponent<TMP_Text>();
+		itemAmountComponent = transform.GetChild(2).GetComponent<TMP_Text>();
+	}
+	public virtual void ResetUiVisuals()
+	{
+		Instantiate();
 		itemIconComponent.sprite = itemIcon;
 		itemNameComponent.text = itemName;
-		itemAmountComponent.text = itemAmount.ToString();
-	}
-	private void OnTriggerEnter2D(Collider2D collision)
+		itemAmountComponent.text = itemAmount == 1? "" : itemAmount.ToString();
+	} 
+	public virtual void CopyValues(Item Item)
 	{
-		//TODO: add to player inventory
-		if(collision.CompareTag("Player"))
-		{
-			PlayerManager.Manager.PlayerInventory.AddItem(this); 
-			Destroy(transform.gameObject);
-		}
+		itemName = Item.itemName;
+		itemAmount = Item.itemAmount;
+		itemIcon = Item.itemIcon;
 	}
-
+	public Item GetCopy()
+	{
+		return new Item() { itemName = this.itemName, itemAmount = this.itemAmount, itemIcon = this.itemIcon };
+	}
 }

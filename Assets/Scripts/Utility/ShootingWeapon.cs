@@ -50,9 +50,10 @@ public class ShootingWeapon : MonoBehaviour, IWeapon
 	public void Use()
 	{
 		if (Time.time < shotTime) return;
-		shotTime = Time.time + cooldown;
 
-		Debug.Log("shot");
+		if (!PlayerManager.Manager.PlayerInventory.UseItem("Bullet")) return;
+
+		shotTime = Time.time + cooldown;
 
 		transform.DOLocalMove(recoil * (transform.localPosition.x >= 0 ? - transform.right : transform.right), recoilDuration);
 		transform.DORotate(new Vector3(0, 0, transform.localPosition.x >= 0? recoilAngle : -recoilAngle), recoilDuration, RotateMode.LocalAxisAdd);
