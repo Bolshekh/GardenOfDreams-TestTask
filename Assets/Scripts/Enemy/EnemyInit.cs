@@ -6,16 +6,20 @@ using UnityEngine.UI;
 public class EnemyInit : MonoBehaviour
 {
 	HealthSystem healthSystem;
-	[SerializeField] Slider healthSlider;
 	Rigidbody2D enemyRigidbody;
+	[SerializeField] Slider healthSlider;
+	[SerializeField] GameObject ItemDropPrefab;
 	// Start is called before the first frame update
 	void Start()
 	{
 		healthSystem = GetComponent<HealthSystem>();
 		enemyRigidbody = GetComponent<Rigidbody2D>();
+		var _ai = GetComponent<EnemyAi>();
 
 		healthSlider.maxValue = healthSystem.MaxHealthPoints;
 		healthSlider.value = healthSystem.CurrentHealthPoints;
+
+		PlayerManager.Manager.PlayerHealth.EntityDied += (s, e) => { _ai.IsIgnoringPlayer = true; };
 
 		healthSystem.EntityHit += (s, e) =>
 		{
@@ -41,6 +45,10 @@ public class EnemyInit : MonoBehaviour
 
 		healthSystem.EntityDied += (s, e) =>
 		{
+			GetComponent<EnemyAi>().IsDying = true;
+
+			Instantiate(ItemDropPrefab, transform.position, Quaternion.identity);
+
 			Destroy(transform.gameObject, 1f);
 		};
 	}

@@ -5,7 +5,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-[Serializable]
+
 public class Item : MonoBehaviour, IUsable
 {
 	public string ItemName

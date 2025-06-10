@@ -36,7 +36,7 @@ public class WeaponSway : MonoBehaviour
 		RenderLine();
 		PositionGun();
 		RotateGun();
-		//MirrorGun();
+		MirrorGun();
 
 		//Debug.DrawRay(transform.position, targeting, Color.red, 1f);
 		//	Debug.DrawRay(playerMovement.transform.position, targeting, Color.yellow, 1f);
@@ -68,7 +68,8 @@ public class WeaponSway : MonoBehaviour
 	void RenderLine()
 	{
 		var _hit = Physics2D.Raycast(gunPoint.transform.position, transform.up, Mathf.Infinity, targetLayer.value);
-		lineRenderer.SetPositions(new Vector3[] { gunPoint.transform.position, _hit.point });
+		
+		lineRenderer.SetPositions(new Vector3[] { gunPoint.transform.position, _hit? _hit.point : gunPoint.transform.position });
 	}
 	void MirrorGun()
 	{//TODO: find better method on texture mirroring

@@ -18,24 +18,25 @@ public class PlayerInit : MonoBehaviour
 	void Start()
 	{
 		var _health = GetComponent<HealthSystem>();
-		var _partls = transform.GetChild(1).GetComponent<ParticleSystem>();
+		var _rigid = GetComponent<Rigidbody2D>();
 		healthSlider.maxValue = _health.MaxHealthPoints;
 		healthSlider.value = _health.MaxHealthPoints;
 		health = _health.MaxHealthPoints;
-		_health.BeforeEntityHit += (s, e) =>
-		{
-			if (e.HitInfo.Hitter.CompareTag("PlayerBullet"))
-			{
-				e.IsCancelled = true;
-				e.OverrideResponse = true;
-				e.OverridenResponse = HitResponse.Ignore | HitResponse.PassThrough;
-			}
-		};
+		//_health.BeforeEntityHit += (s, e) =>
+		//{
+		//	if (e.HitInfo.Hitter.CompareTag("PlayerBullet"))
+		//	{
+		//		e.IsCancelled = true;
+		//		e.OverrideResponse = true;
+		//		e.OverridenResponse = HitResponse.Ignore | HitResponse.PassThrough;
+		//	}
+		//};
 		_health.EntityHit += (s, e) =>
 		{
+			_rigid.AddForce(e.HitInfo.Knockback, ForceMode2D.Impulse);
+
 			healthSlider.value = e.HealthAfter;
 			health = e.HealthAfter;
-			_partls.Play();
 
 			if (e.HealthAfter < _health.MaxHealthPoints)
 				healthSlider.gameObject.SetActive(true);
